@@ -1,0 +1,50 @@
+storage:
+  type: sqlite
+  path: /data/gatus.db
+
+ui:
+  title: SongShare status
+  header: SongShare
+  description: Resolving music links across streaming services.
+
+endpoints:
+  - name: app
+    group: songshare
+    url: http://songshare:3000/health
+    interval: 30s
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].status == ok"
+
+  - name: spotify
+    group: providers
+    url: http://songshare:3000/health/providers
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].providers.spotify.status == ok"
+
+  - name: deezer
+    group: providers
+    url: http://songshare:3000/health/providers
+    interval: 60s
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].providers.deezer.status == ok"
+
+# Alerting: uncomment, set the webhook in .env, and add an `alerts:` block to
+# any endpoint above.
+#
+# alerting:
+#   telegram:
+#     token: "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+#     id: "0123456789"
+#     topic-id: "7"
+#
+# endpoints:
+#   - name: deezer
+#     alerts:
+#       - type: telegram
+#         failure-threshold: 2
+#         send-on-resolved: true
+#         description: Deezer check failing

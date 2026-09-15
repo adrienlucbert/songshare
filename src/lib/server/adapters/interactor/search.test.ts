@@ -22,6 +22,7 @@ function fakeProvider(id: string, host: string, options: FakeOptions = {}): Musi
 
 	return {
 		id,
+		probeUrl: `https://${host}/probe`,
 		supports: (link: ShareLink) => link.host === host,
 		fetchLinkContent: vi.fn(async () => fetched),
 		search: vi.fn(async () => match)
@@ -107,6 +108,7 @@ describe('search', () => {
 		const tidal = fakeProvider('tidal', 'tidal.com', { match: tidalMatch });
 		const broken: MusicProvider = {
 			id: 'deezer',
+			probeUrl: 'https://deezer.test/probe',
 			supports: () => false,
 			fetchLinkContent: vi.fn(),
 			search: vi.fn(async () => {
@@ -156,6 +158,7 @@ describe('search', () => {
 		const interactor = newSearchInteractor([
 			{
 				id: 'spotify',
+				probeUrl: 'https://spotify.test/probe',
 				supports: () => true,
 				fetchLinkContent: vi.fn(async () => {
 					throw boom;

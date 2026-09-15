@@ -1,0 +1,15 @@
+services:
+  songshare:
+    build:
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  db:
+    ports:
+      - 5432:5432
+
+  gatus:
+    ports:
+      - 8080:8080

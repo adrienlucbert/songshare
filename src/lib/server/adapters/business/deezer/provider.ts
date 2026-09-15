@@ -1,6 +1,7 @@
 import * as v from 'valibot';
 import {
 	EntityNotFoundError,
+	ProviderContractError,
 	ProviderUnavailableError,
 	UnsupportedLinkError,
 	type MusicProvider
@@ -165,7 +166,7 @@ async function get<S extends v.GenericSchema>(schema: S, path: string): Promise<
 
 	const parsed = v.safeParse(schema, payload);
 	if (!parsed.success) {
-		throw new ProviderUnavailableError(`Unexpected Deezer response: ${v.summarize(parsed.issues)}`);
+		throw new ProviderContractError(`Unexpected Deezer response: ${v.summarize(parsed.issues)}`);
 	}
 
 	return parsed.output;
@@ -193,6 +194,8 @@ function toArtist(contributor: v.InferOutput<typeof Contributor>): Artist {
 
 export class DeezerProvider implements MusicProvider {
 	readonly id = 'deezer';
+
+	readonly probeUrl = 'https://www.deezer.com/track/3786363472';
 
 	supports(link: ShareLink): boolean {
 		return HOSTS.has(link.host);

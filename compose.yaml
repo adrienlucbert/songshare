@@ -1,14 +1,46 @@
 services:
+  songshare:
+    build:
+      context: .
+    restart: unless-stopped
+    env_file:
+      - path: ./.env
+        required: true
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      DATABASE_URL: postgres://root:mysecretpassword@db:5432/local
+    ports:
+      - 3000:3000
+    networks:
+      - songshare
+
   db:
     image: postgres
-    restart: always
-    ports:
-      - 5432:5432
+    restart: unless-stopped
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: local
     volumes:
       - pgdata:/var/lib/postgresql
+    networks:
+      - songshare
+
+  gatus:
+    image: twinproduction/gatus:latest
+    restart: unless-stopped
+    volumes:
+      - ./gatus.yaml:/config/config.yaml:ro
+      - gatus:/data
+    depends_on:
+      - songshare
+    networks:
+      - songshare
+
+networks:
+  songshare:
+
 volumes:
   pgdata:
+  gatus:

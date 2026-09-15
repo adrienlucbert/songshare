@@ -1,6 +1,7 @@
 import * as v from 'valibot';
 import {
 	EntityNotFoundError,
+	ProviderContractError,
 	ProviderUnavailableError,
 	UnsupportedLinkError,
 	type MusicProvider
@@ -123,9 +124,7 @@ async function get<S extends v.GenericSchema>(
 
 	const parsed = v.safeParse(schema, data);
 	if (!parsed.success) {
-		throw new ProviderUnavailableError(
-			`Unexpected Spotify response: ${v.summarize(parsed.issues)}`
-		);
+		throw new ProviderContractError(`Unexpected Spotify response: ${v.summarize(parsed.issues)}`);
 	}
 
 	return parsed.output;
@@ -206,6 +205,8 @@ function toPodcastEpisode(episode: v.InferOutput<typeof EpisodeResponse>): Podca
 
 export class SpotifyProvider implements MusicProvider {
 	readonly id = 'spotify';
+
+	readonly probeUrl = 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8';
 
 	supports(link: ShareLink): boolean {
 		return HOSTS.has(link.host);

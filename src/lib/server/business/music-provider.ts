@@ -22,8 +22,17 @@ export class ProviderUnavailableError extends Error {
 	}
 }
 
+export class ProviderContractError extends ProviderUnavailableError {
+	constructor(message: string) {
+		super(message);
+		this.name = 'ProviderContractError';
+	}
+}
+
 export interface MusicProvider {
 	readonly id: string;
+
+	readonly probeUrl: string;
 
 	supports(link: ShareLink): boolean;
 	fetchLinkContent(link: ShareLink): Promise<AnyEntity>;
