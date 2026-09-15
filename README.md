@@ -25,11 +25,11 @@ curl 'https://link/api?url=https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8
 
 ```json
 {
- "origin": "spotify",
- "matches": {
-  "spotify": { "type": "track", "name": "Never Gonna Give You Up", "url": "…" },
-  "deezer": { "type": "track", "name": "Never Gonna Give You Up", "url": "…" }
- }
+	"origin": "spotify",
+	"matches": {
+		"spotify": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." },
+		"deezer": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." }
+	}
 }
 ```
 
@@ -68,6 +68,8 @@ Then fill in the values:
 - `DATABASE_URL` is only used by the `db:*` scripts
 - `SPOTIFY_CLIENT_ID` Spotify client ID ([developer dashboard](https://developer.spotify.com/dashboard))
 - `SPOTIFY_CLIENT_SECRET` Spotify client secret ([developer dashboard](https://developer.spotify.com/dashboard))
+- `ALLOWED_HOSTS` optional, comma-separated. Hostnames the **dev** server accepts
+  besides `localhost`; production is unaffected.
 
 #### With Node
 
