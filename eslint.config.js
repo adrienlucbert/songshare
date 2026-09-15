@@ -38,6 +38,8 @@ export default defineConfig(
 		}
 	},
 	{
-		rules: {}
+		rules: {
+			'no-empty': ['error', { allowEmptyCatch: true }]
+		}
 	}
 );
