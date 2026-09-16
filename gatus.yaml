@@ -19,7 +19,7 @@ endpoints:
   - name: spotify
     group: providers
     url: http://songshare:3000/health/providers
-    interval: 60s
+    interval: 300s
     conditions:
       - "[STATUS] == 200"
       - "[BODY].providers.spotify.status == ok"
@@ -27,7 +27,7 @@ endpoints:
   - name: deezer
     group: providers
     url: http://songshare:3000/health/providers
-    interval: 60s
+    interval: 300s
     conditions:
       - "[STATUS] == 200"
       - "[BODY].providers.deezer.status == ok"
