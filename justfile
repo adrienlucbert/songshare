@@ -9,17 +9,17 @@ default:
 	@just --list
 
 # Build and run the stack: app on 3000, monitoring on 3001
-run:
-	docker compose {{prod_files}} up --build
+run *FLAGS:
+	docker compose {{prod_files}} up {{FLAGS}}
 
 # Build and run the stack with the working tree mounted and hot reload
-dev:
-	docker compose {{dev_files}} up --build
+dev *FLAGS:
+	docker compose {{dev_files}} up {{FLAGS}}
 
 # Build and run the stack behind an existing Traefik, using SONGSHARE_HOST
-run-traefik:
-	docker compose {{traefik_files}} up --build
+run-traefik *FLAGS:
+	docker compose {{traefik_files}} up {{FLAGS}}
 
 # Stop everything and remove the containers
-down:
-	docker compose {{dev_files}} down
+down *FLAGS:
+	docker compose {{dev_files}} down {{FLAGS}}
