@@ -5,4 +5,4 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<LinkView {data} />
+<LinkView {data} shared />

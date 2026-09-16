@@ -1,5 +1,11 @@
+import { redirect } from '@sveltejs/kit';
+import { StatusCodes } from 'http-status-codes';
 import type { PageServerLoad } from './$types';
-import { searchInteractor, searchPagePresenter } from '$lib/server/composition';
+import {
+	searchInteractor,
+	searchPagePresenter,
+	shareLinkInteractor
+} from '$lib/server/composition';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const query = url.searchParams.get('url')?.trim() ?? '';
@@ -8,11 +14,14 @@ export const load: PageServerLoad = async ({ url }) => {
 		return { query, results: null, failure: null };
 	}
 
-	try {
-		const output = await searchInteractor.search({ url: query });
+	let id: string;
 
-		return { query, ...searchPagePresenter.presentOk(output) };
+	try {
+		await searchInteractor.search({ url: query });
+		({ id } = await shareLinkInteractor.share({ url: query }));
 	} catch (error) {
 		return { query, ...searchPagePresenter.presentError(error) };
 	}
+
+	redirect(StatusCodes.MOVED_TEMPORARILY, `/s/${id}`);
 };
