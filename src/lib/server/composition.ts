@@ -28,3 +28,8 @@ export const healthInteractor: health.Interactor = newCachedHealthInteractor(
 export const healthPresenter: Presenter<health.Output, Response> = newJsonPresenter(presentHealth);
 
 export const searchPagePresenter: Presenter<Output, PageView<Output>> = newPagePresenter<Output>();
+
+export const healthPagePresenter: Presenter<
+	health.Output,
+	PageView<health.Output>
+> = newPagePresenter<health.Output>();

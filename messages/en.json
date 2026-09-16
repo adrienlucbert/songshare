@@ -28,5 +28,15 @@
 	"kind_artist": "Artist",
 	"kind_podcast": "Podcast",
 	"kind_podcast_episode": "Episode",
-	"trademarks": "Spotify and Deezer are trademarks of their respective owners."
+	"nav_status": "Status",
+	"status_title": "Service status",
+	"status_ok": "Operational",
+	"status_degraded": "Degraded",
+	"status_failing": "Failing",
+	"reason_contract": "The service changed its API",
+	"reason_unreachable": "The service did not answer",
+	"reason_missing": "The probe link no longer resolves",
+	"reason_unmatched": "Matching stopped working",
+	"reason_internal": "Something went wrong on our side",
+	"last_checked": "Last checked"
 }
