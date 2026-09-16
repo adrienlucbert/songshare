@@ -1,11 +1,14 @@
 <script lang="ts">
 	import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
 	import Check from '@lucide/svelte/icons/check';
+	import Copy from '@lucide/svelte/icons/copy';
 	import Languages from '@lucide/svelte/icons/languages';
 	import Link2 from '@lucide/svelte/icons/link-2';
 	import Moon from '@lucide/svelte/icons/moon';
 	import Music from '@lucide/svelte/icons/music';
 	import Search from '@lucide/svelte/icons/search';
+	import Server from '@lucide/svelte/icons/server';
+	import Terminal from '@lucide/svelte/icons/terminal';
 	import Sun from '@lucide/svelte/icons/sun';
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
@@ -99,12 +102,19 @@
 	const title = $derived(subject ? `${subject.name} - SongShare` : 'SongShare');
 	const description = $derived(subject ? caption : t(m.page_description));
 
-	let copied = $state(false);
+	const GITHUB = 'https://github.com/adrienlucbert/songshare';
+	const SELF_HOSTING = 'https://github.com/adrienlucbert/songshare#self-hosting';
 
-	async function copyPageLink() {
-		await navigator.clipboard.writeText(page.url.href);
-		copied = true;
-		setTimeout(() => (copied = false), 1500);
+	const demoLink = $derived(data.query || 'https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8');
+
+	const curlCommand = $derived(`curl '${page.url.origin}/api?url=${demoLink}'`);
+
+	let copied = $state<'page' | 'command' | null>(null);
+
+	async function copy(what: 'page' | 'command', text: string) {
+		await navigator.clipboard.writeText(text);
+		copied = what;
+		setTimeout(() => (copied = null), 1500);
 	}
 
 	let dark = $state(false);
@@ -289,10 +299,58 @@
 			</ul>
 
 			<div class="flex justify-end border-t px-3 py-2">
-				<Button variant="ghost" size="sm" onclick={copyPageLink}>
-					{#if copied}<Check />{t(m.copied)}{:else}<Link2 />{t(m.copy_page)}{/if}
+				<Button variant="ghost" size="sm" onclick={() => copy('page', page.url.href)}>
+					{#if copied === 'page'}<Check />{t(m.copied)}{:else}<Link2 />{t(m.copy_page)}{/if}
 				</Button>
 			</div>
 		</div>
 	{/if}
+
+	<section class="space-y-2">
+		<p class="flex items-center gap-1.5 text-xs text-muted-foreground">
+			<Terminal class="size-3.5 shrink-0" />
+			{t(m.api_hint)}
+		</p>
+
+		<div class="flex items-start gap-2 rounded-lg border bg-muted/40 px-3 pt-3 pb-1">
+			<code class="min-w-0 flex-1 overflow-x-auto pb-2 font-mono text-xs whitespace-pre"
+				>{curlCommand}</code
+			>
+			<Button
+				variant="ghost"
+				size="xs"
+				aria-label={t(m.copy_command)}
+				onclick={() => copy('command', curlCommand)}
+			>
+				{#if copied === 'command'}<Check />{:else}<Copy />{/if}
+			</Button>
+		</div>
+	</section>
+
+	<footer class="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-6">
+		<a
+			href={GITHUB}
+			target="_blank"
+			rel="noreferrer"
+			aria-label={t(m.view_source)}
+			class="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+		>
+			<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="size-3.5">
+				<path
+					d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+				/>
+			</svg>
+			GitHub
+		</a>
+
+		<a
+			href={SELF_HOSTING}
+			target="_blank"
+			rel="noreferrer"
+			class="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+		>
+			<Server class="size-3.5 shrink-0" />
+			{t(m.self_host)}
+		</a>
+	</footer>
 </main>
