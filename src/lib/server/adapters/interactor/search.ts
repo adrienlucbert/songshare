@@ -4,7 +4,7 @@ import { ShareLink } from '../../domain/share-link';
 import type { Input, Interactor, Output } from '../../usecase/search';
 
 class SearchInteractor implements Interactor {
-	constructor(private readonly providers: readonly MusicProvider[]) { }
+	constructor(private readonly providers: readonly MusicProvider[]) {}
 
 	async search(input: Input): Promise<Output> {
 		const link = ShareLink.parse(input.url);

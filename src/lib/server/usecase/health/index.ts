@@ -1,4 +1,3 @@
-/** Worst-case reading of a check, in the order a reader cares about. */
 export type Status = 'ok' | 'degraded' | 'failing';
 
 export type Reason = 'contract' | 'unreachable' | 'missing' | 'internal';

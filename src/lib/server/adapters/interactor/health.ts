@@ -40,7 +40,7 @@ type Probe = {
 };
 
 class HealthInteractor implements Interactor {
-	constructor(private readonly providers: readonly MusicProvider[]) { }
+	constructor(private readonly providers: readonly MusicProvider[]) {}
 
 	async check(): Promise<Output> {
 		const probes = await Promise.all(this.providers.map((p) => this.resolve(p)));
