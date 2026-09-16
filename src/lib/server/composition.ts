@@ -20,9 +20,12 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 const cache = newPostgresProviderCache(CACHE_TTL_MS);
 
+const spotify = new SpotifyProvider();
+const deezer = new DeezerProvider();
+
 const providers: readonly MusicProvider[] = [
-	newCachedProvider(new SpotifyProvider(), cache),
-	newCachedProvider(new DeezerProvider(), cache)
+	newCachedProvider(spotify, cache),
+	newCachedProvider(deezer, cache)
 ];
 
 export const shareLinkInteractor: shareLink.Interactor = newShareLinkInteractor(
@@ -33,11 +36,10 @@ export const searchInteractor: Interactor = newSearchInteractor(providers);
 
 export const searchJsonPresenter: Presenter<Output, Response> = newJsonPresenter(presentSearch);
 
-/** Probes run at most this often, however often the endpoint is polled. */
 const HEALTH_TTL_MS = 5 * 60 * 1000;
 
 export const healthInteractor: health.Interactor = newCachedHealthInteractor(
-	newHealthInteractor(providers),
+	newHealthInteractor([spotify, deezer]),
 	HEALTH_TTL_MS
 );
 
