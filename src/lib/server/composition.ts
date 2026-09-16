@@ -1,4 +1,6 @@
+import { newCachedProvider } from './adapters/business/cached-provider';
 import { DeezerProvider } from './adapters/business/deezer/provider';
+import { newPostgresProviderCache } from './adapters/business/repository/postgres-provider-cache';
 import { SpotifyProvider } from './adapters/business/spotify/provider';
 import { newCachedHealthInteractor, newHealthInteractor } from './adapters/interactor/health';
 import { newSearchInteractor } from './adapters/interactor/search';
@@ -11,7 +13,14 @@ import type { Presenter } from './usecase/presenter';
 import type * as health from './usecase/health';
 import type { Interactor, Output } from './usecase/search';
 
-const providers: readonly MusicProvider[] = [new SpotifyProvider(), new DeezerProvider()];
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
+const cache = newPostgresProviderCache(CACHE_TTL_MS);
+
+const providers: readonly MusicProvider[] = [
+	newCachedProvider(new SpotifyProvider(), cache),
+	newCachedProvider(new DeezerProvider(), cache)
+];
 
 export const searchInteractor: Interactor = newSearchInteractor(providers);
 
