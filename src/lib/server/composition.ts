@@ -1,9 +1,11 @@
 import { newCachedProvider } from './adapters/business/cached-provider';
 import { DeezerProvider } from './adapters/business/deezer/provider';
 import { newPostgresProviderCache } from './adapters/business/repository/postgres-provider-cache';
+import { newPostgresSharedLinkRepository } from './adapters/business/repository/postgres-shared-link-repository';
 import { SpotifyProvider } from './adapters/business/spotify/provider';
 import { newCachedHealthInteractor, newHealthInteractor } from './adapters/interactor/health';
 import { newSearchInteractor } from './adapters/interactor/search';
+import { newShareLinkInteractor } from './adapters/interactor/share-link';
 import { presentHealth } from './adapters/presenter/health';
 import { newJsonPresenter } from './adapters/presenter/json';
 import { newPagePresenter, type PageView } from './adapters/presenter/page';
@@ -12,6 +14,7 @@ import type { MusicProvider } from './business/music-provider';
 import type { Presenter } from './usecase/presenter';
 import type * as health from './usecase/health';
 import type { Interactor, Output } from './usecase/search';
+import type * as shareLink from './usecase/share-link';
 
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -21,6 +24,10 @@ const providers: readonly MusicProvider[] = [
 	newCachedProvider(new SpotifyProvider(), cache),
 	newCachedProvider(new DeezerProvider(), cache)
 ];
+
+export const shareLinkInteractor: shareLink.Interactor = newShareLinkInteractor(
+	newPostgresSharedLinkRepository()
+);
 
 export const searchInteractor: Interactor = newSearchInteractor(providers);
 
