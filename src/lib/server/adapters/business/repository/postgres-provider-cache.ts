@@ -17,7 +17,7 @@ function revive(entity: unknown): AnyEntity {
 export function newPostgresProviderCache(ttlMs: number): ProviderCache {
 	return {
 		async read(provider, kind, key): Promise<CachedAnswer | null> {
-			const [row] = await db
+			const [row] = await db()
 				.select({ entity: providerCache.entity })
 				.from(providerCache)
 				.where(
@@ -38,7 +38,7 @@ export function newPostgresProviderCache(ttlMs: number): ProviderCache {
 		async write(provider, kind: CacheKind, key, entity): Promise<void> {
 			const expiresAt = new Date(Date.now() + ttlMs);
 
-			await db
+			await db()
 				.insert(providerCache)
 				.values({ provider, kind, key, entity, expiresAt })
 				.onConflictDoUpdate({
@@ -50,7 +50,9 @@ export function newPostgresProviderCache(ttlMs: number): ProviderCache {
 }
 
 export async function sweepExpired(): Promise<number> {
-	const removed = await db.delete(providerCache).where(lt(providerCache.expiresAt, sql`now()`));
+	const removed = await db()
+		.delete(providerCache)
+		.where(lt(providerCache.expiresAt, sql`now()`));
 
 	return removed.count ?? 0;
 }

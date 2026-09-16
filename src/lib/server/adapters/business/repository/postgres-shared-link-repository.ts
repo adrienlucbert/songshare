@@ -16,7 +16,7 @@ function mintId(): string {
 export function newPostgresSharedLinkRepository(): SharedLinkRepository {
 	return {
 		async share(url: string): Promise<SharedLink> {
-			const [row] = await db
+			const [row] = await db()
 				.insert(sharedLink)
 				.values({ id: mintId(), url })
 				.onConflictDoUpdate({ target: sharedLink.url, set: { url } })
@@ -26,7 +26,7 @@ export function newPostgresSharedLinkRepository(): SharedLinkRepository {
 		},
 
 		async find(id: string): Promise<SharedLink | null> {
-			const [row] = await db
+			const [row] = await db()
 				.select({ id: sharedLink.id, url: sharedLink.url })
 				.from(sharedLink)
 				.where(eq(sharedLink.id, id))
