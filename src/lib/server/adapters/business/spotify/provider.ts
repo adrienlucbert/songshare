@@ -18,6 +18,7 @@ import type {
 } from '$lib/server/domain/entity';
 import type { ShareLink } from '$lib/server/domain/share-link';
 import { SpotifyUnavailableError } from './auth';
+import { rateLimitedFor } from './rate-limit';
 import { getClient } from './client';
 import { barcodeVariants, looselyMatches, phrase } from '../matching';
 
@@ -117,6 +118,13 @@ async function get<S extends v.GenericSchema>(
 		if (response.status === 404) {
 			throw new EntityNotFoundError('No such entity on Spotify');
 		}
+
+		if (response.status === 429) {
+			throw new ProviderUnavailableError(
+				`Spotify is rate limiting us; retry in ${rateLimitedFor()}s`
+			);
+		}
+
 		throw new ProviderUnavailableError(
 			`Spotify request failed: ${response.status} ${response.statusText}`
 		);

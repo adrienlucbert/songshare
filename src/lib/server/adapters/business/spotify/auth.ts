@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/private';
+import { noteRateLimit, rateLimitedFor } from './rate-limit';
 
 const ACCOUNTS_BASE_URL = 'https://accounts.spotify.com';
 const EXPIRY_MARGIN_MS = 60_000;
@@ -40,6 +41,11 @@ async function requestToken(): Promise<Token> {
 		);
 	}
 
+	const waiting = rateLimitedFor();
+	if (waiting > 0) {
+		throw new SpotifyUnavailableError(`Spotify is rate limiting us; retry in ${waiting}s`);
+	}
+
 	const response = await fetch(`${ACCOUNTS_BASE_URL}/api/token`, {
 		method: 'POST',
 		headers: {
@@ -48,6 +54,11 @@ async function requestToken(): Promise<Token> {
 		},
 		body: new URLSearchParams({ grant_type: 'client_credentials' })
 	});
+
+	if (response.status === 429) {
+		noteRateLimit(response);
+		throw new SpotifyUnavailableError(`Spotify is rate limiting us; retry in ${rateLimitedFor()}s`);
+	}
 
 	if (!response.ok) {
 		throw new SpotifyUnavailableError(
