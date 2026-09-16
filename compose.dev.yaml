@@ -6,6 +6,14 @@ services:
       - .:/app
       - /app/node_modules
 
+  migrate:
+    build:
+      dockerfile: Dockerfile.dev
+      target: !reset null
+    volumes:
+      - .:/app
+      - /app/node_modules
+
   db:
     ports:
       - 5432:5432

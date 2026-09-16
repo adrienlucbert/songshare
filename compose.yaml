@@ -12,6 +12,22 @@ services:
       DATABASE_URL: postgres://root:mysecretpassword@db:5432/local
     ports:
       - 3000:3000
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - songshare
+
+  migrate:
+    build:
+      context: .
+      target: builder
+    environment:
+      DATABASE_URL: postgres://root:mysecretpassword@db:5432/local
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["npm", "run", "db:migrate"]
     networks:
       - songshare
 
@@ -22,6 +38,11 @@ services:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     volumes:
       - pgdata:/var/lib/postgresql
     networks:
