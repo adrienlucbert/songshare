@@ -4,7 +4,6 @@ import {
 	ProviderUnavailableError,
 	type MusicProvider
 } from '../../business/music-provider';
-import type { AnyEntity } from '../../domain/entity';
 import { ShareLink } from '../../domain/share-link';
 import type { Interactor, Output, ProviderHealth, Reason, Status } from '../../usecase/health';
 
@@ -12,8 +11,7 @@ const SEVERITY: Record<Reason, Status> = {
 	contract: 'failing',
 	unreachable: 'failing',
 	internal: 'failing',
-	missing: 'degraded',
-	unmatched: 'degraded'
+	missing: 'degraded'
 };
 
 const RANK: Record<Status, number> = { ok: 0, degraded: 1, failing: 2 };
@@ -39,7 +37,6 @@ function diagnose(error: unknown): { reason: Reason; detail: string } {
 type Probe = {
 	id: string;
 	health: ProviderHealth;
-	entity: AnyEntity | null;
 };
 
 class HealthInteractor implements Interactor {
@@ -48,22 +45,10 @@ class HealthInteractor implements Interactor {
 	async check(): Promise<Output> {
 		const probes = await Promise.all(this.providers.map((p) => this.resolve(p)));
 
-		const reference = probes.find((probe) => probe.entity !== null);
-
-		const checked = await Promise.all(
-			probes.map(async (probe, i) => ({
-				id: probe.id,
-				health:
-					probe === reference || !reference?.entity
-						? probe.health
-						: await this.withMatch(this.providers[i], probe.health, reference.entity)
-			}))
-		);
-
 		return {
-			status: worst(checked.map((c) => c.health.status)),
+			status: worst(probes.map((probe) => probe.health.status)),
 			checkedAt: new Date().toISOString(),
-			providers: Object.fromEntries(checked.map((c) => [c.id, c.health]))
+			providers: Object.fromEntries(probes.map((probe) => [probe.id, probe.health]))
 		};
 	}
 
@@ -71,11 +56,10 @@ class HealthInteractor implements Interactor {
 		const started = Date.now();
 
 		try {
-			const entity = await provider.fetchLinkContent(ShareLink.parse(provider.probeUrl));
+			await provider.fetchLinkContent(ShareLink.parse(provider.probeUrl));
 
 			return {
 				id: provider.id,
-				entity,
 				health: { status: 'ok', durationMs: Date.now() - started }
 			};
 		} catch (error) {
@@ -83,7 +67,6 @@ class HealthInteractor implements Interactor {
 
 			return {
 				id: provider.id,
-				entity: null,
 				health: {
 					status: SEVERITY[reason],
 					durationMs: Date.now() - started,
@@ -91,29 +74,6 @@ class HealthInteractor implements Interactor {
 					detail
 				}
 			};
-		}
-	}
-
-	private async withMatch(
-		provider: MusicProvider,
-		health: ProviderHealth,
-		reference: AnyEntity
-	): Promise<ProviderHealth> {
-		if (health.status === 'failing') return health;
-
-		try {
-			if (await provider.search(reference)) return health;
-
-			return {
-				...health,
-				status: worst([health.status, 'degraded']),
-				reason: 'unmatched',
-				detail: `no match found for ${reference.type} "${reference.name}"`
-			};
-		} catch (error) {
-			const { reason, detail } = diagnose(error);
-
-			return { ...health, status: worst([health.status, SEVERITY[reason]]), reason, detail };
 		}
 	}
 }

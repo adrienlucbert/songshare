@@ -36,7 +36,6 @@
 	"reason_contract": "Le service a modifié son API",
 	"reason_unreachable": "Le service n'a pas répondu",
 	"reason_missing": "Le lien de test ne résout plus",
-	"reason_unmatched": "La correspondance ne fonctionne plus",
 	"reason_internal": "Une erreur est survenue de notre côté",
 	"last_checked": "Dernière vérification"
 }

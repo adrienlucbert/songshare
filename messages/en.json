@@ -36,7 +36,6 @@
 	"reason_contract": "The service changed its API",
 	"reason_unreachable": "The service did not answer",
 	"reason_missing": "The probe link no longer resolves",
-	"reason_unmatched": "Matching stopped working",
 	"reason_internal": "Something went wrong on our side",
 	"last_checked": "Last checked"
 }

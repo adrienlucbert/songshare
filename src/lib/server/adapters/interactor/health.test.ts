@@ -82,23 +82,16 @@ describe('health check', () => {
 		expect(output.providers.spotify).toMatchObject({ status: 'degraded', reason: 'missing' });
 	});
 
-	it('flags a provider that resolves but can no longer match', async () => {
-		const output = await check([fakeProvider('spotify'), fakeProvider('deezer', { match: null })]);
-
-		expect(output.providers.deezer).toMatchObject({
-			status: 'degraded',
-			reason: 'unmatched'
-		});
-		expect(output.status).toBe('degraded');
-	});
-
-	it('never asks the reference provider to match its own entity', async () => {
+	it('costs one request per provider and never searches', async () => {
 		const spotify = fakeProvider('spotify');
 		const deezer = fakeProvider('deezer');
+
 		await check([spotify, deezer]);
 
+		expect(spotify.fetchLinkContent).toHaveBeenCalledOnce();
+		expect(deezer.fetchLinkContent).toHaveBeenCalledOnce();
 		expect(spotify.search).not.toHaveBeenCalled();
-		expect(deezer.search).toHaveBeenCalledOnce();
+		expect(deezer.search).not.toHaveBeenCalled();
 	});
 
 	it('calls anything it does not recognise internal', async () => {
