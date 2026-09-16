@@ -4,6 +4,7 @@
 	import Moon from '@lucide/svelte/icons/moon';
 	import Music from '@lucide/svelte/icons/music';
 	import Server from '@lucide/svelte/icons/server';
+	import Terminal from '@lucide/svelte/icons/terminal';
 	import Sun from '@lucide/svelte/icons/sun';
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
@@ -18,6 +19,7 @@
 
 	const GITHUB = 'https://github.com/adrienlucbert/songshare';
 	const SELF_HOSTING = 'https://github.com/adrienlucbert/songshare#self-hosting';
+	const API_DOCS = 'https://github.com/adrienlucbert/songshare#public-api';
 
 	const LANGUAGES: { value: Locale; flag: string; name: string }[] = [
 		{ value: 'en', flag: '🇬🇧', name: 'English' },
@@ -111,6 +113,16 @@
 				/>
 			</svg>
 			GitHub
+		</a>
+
+		<a
+			href={API_DOCS}
+			target="_blank"
+			rel="noreferrer"
+			class="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+		>
+			<Terminal class="size-3.5 shrink-0" />
+			API
 		</a>
 
 		<a

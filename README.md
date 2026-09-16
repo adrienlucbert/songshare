@@ -17,21 +17,74 @@ Share musics, albums, artists, podcasts across music streaming services.
 
 ## Public API
 
-This project can be [self-hosted](#self-hosting), but if you prefer, it is hosted and available for free at [link](link).
+SongShare is built around straightforward public API.
+This project can be [self-hosted](#self-hosting), but if you prefer,
+it is hosted and available for free at [https://songshare.example.com](https://songshare.example.com).
+
+### `GET /api?url=<share link>`
+
+Resolves the share link and searches for the same entity on every other supported
+provider.
 
 ```sh
-curl 'https://link/api?url=https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8'
+curl 'https://songshare.example.com/api?url=https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8'
 ```
 
 ```json
 {
  "origin": "spotify",
  "matches": {
-  "spotify": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." },
+  "spotify": {
+   "type": "track",
+   "name": "Never Gonna Give You Up",
+   "url": "https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8",
+   "isrc": "GBARL9300135",
+   "artists": [{ "type": "artist", "name": "Rick Astley", "url": "..." }],
+   "album": {
+    "type": "album",
+    "name": "The Best of Me",
+    "upc": "4050538598209",
+    "url": "...",
+    "cover": { "url": "..." },
+    "artists": [{ "type": "artist", "name": "Rick Astley", "url": "..." }],
+    "release_date": "2026-01-28T00:00:00.000Z"
+   }
+  },
   "deezer": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." }
  }
 }
 ```
+
+`origin` names the provider the link came from, and is always one of the keys of
+`matches`. A provider that has no match for the entity is simply absent, so
+`matches` may hold a single entry. Every entity carries a `type`, one of
+`track`, `album`, `artist`, `podcast` or `podcast_episode`; the remaining fields
+depend on it.
+
+### `GET /api/share?url=<share link>`
+
+Generates the short link behind a `/s/<id>` page. The same input always returns the
+same id, so it is safe to call repeatedly.
+
+```sh
+curl 'https://songshare.example.com/api/share?url=https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8'
+```
+
+```json
+{ "id": "yndP8PZb", "url": "https://songshare.example.com/s/yndP8PZb" }
+```
+
+### Errors
+
+Failures come back as `{"message":"…"}` with a status that says whose fault it
+is:
+
+| Status | Meaning                                                                  |
+| ------ | ------------------------------------------------------------------------ |
+| `400`  | The url is malformed, or no supported provider recognises it             |
+| `404`  | The link is well-formed but the provider has no such entity              |
+| `502`  | A provider is unreachable, rate-limiting us, or has changed its contract |
+| `500`  | Anything else; the body is deliberately opaque                           |
 
 ## How matching works
 
