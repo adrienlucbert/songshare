@@ -1,0 +1,31 @@
+services:
+  songshare:
+    ports: !reset null
+    networks:
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK_NAME}"
+      traefik.http.routers.songshare.entrypoints: "${TRAEFIK_ENTRYPOINTS}"
+      traefik.http.routers.songshare.rule: "Host(`${SONGSHARE_HOST:?set SONGSHARE_HOST in .env}`)"
+      traefik.http.routers.songshare.tls: "true"
+      traefik.http.routers.songshare.tls.certresolver: "${TRAEFIK_CERTRESOLVER}"
+      traefik.http.services.songshare.loadbalancer.server.port: 3000
+
+  gatus:
+    ports: !reset null
+    networks:
+      - traefik
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "${TRAEFIK_NETWORK_NAME}"
+      traefik.http.routers.songshare_health.entrypoints: "${TRAEFIK_ENTRYPOINTS}"
+      traefik.http.routers.songshare_health.rule: "Host(`${SONGSHARE_HEALTH_HOST:-health.${SONGSHARE_HOST}}`)"
+      traefik.http.routers.songshare_health.tls: "true"
+      traefik.http.routers.songshare_health.tls.certresolver: "${TRAEFIK_CERTRESOLVER}"
+      traefik.http.services.songshare_health.loadbalancer.server.port: 8080
+
+networks:
+  traefik:
+    external: true
+    name: "${TRAEFIK_NETWORK_NAME}"

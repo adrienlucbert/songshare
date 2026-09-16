@@ -25,11 +25,11 @@ curl 'https://link/api?url=https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8
 
 ```json
 {
-	"origin": "spotify",
-	"matches": {
-		"spotify": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." },
-		"deezer": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." }
-	}
+ "origin": "spotify",
+ "matches": {
+  "spotify": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." },
+  "deezer": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." }
+ }
 }
 ```
 
@@ -70,6 +70,12 @@ Then fill in the values:
 - `SPOTIFY_CLIENT_SECRET` Spotify client secret ([developer dashboard](https://developer.spotify.com/dashboard))
 - `ALLOWED_HOSTS` optional, comma-separated. Hostnames the **dev** server accepts
   besides `localhost`; production is unaffected.
+- `SONGSHARE_HOST` only for `just run-traefik`: the hostname Traefik routes to,
+  e.g. `songshare.example.com`
+- `SONGSHARE_HEALTH_HOST` optional, the status page's hostname. Defaults to `health.` in front of `SONGSHARE_HOST`
+- `TRAEFIK_CERTRESOLVER` Traefik TLS certificate resolver name. Comment `traefik.http.routers.songshare.tls*` lines in `compose.traefik.yaml` if you don't use TLS
+- `TRAEFIK_ENTRYPOINTS` Traefik entrypoint name
+- `TRAEFIK_NETWORK_NAME` Traefik network name
 
 #### With Node
 
@@ -84,6 +90,8 @@ npm run dev
 just run
 # or for development purposes
 just dev
+# or behind an existing Traefik, using SONGSHARE_HOST
+just run-traefik
 ```
 
 |           | Port |                                       |
@@ -92,12 +100,14 @@ just dev
 | gatus     | 8080 | monitoring and the public status page |
 | db        | 5432 | Postgres, unused so far               |
 
-Two compose files, layered:
+Three compose files, layered:
 
 - **`compose.yaml`**: the stack as it runs for production.
 - **`compose.dev.yaml`**: the stack for development purposes, which mounts the
-  working tree for hot reload and publishes the ports above. In production they
-  are reached through a reverse proxy instead.
+  working tree for hot reload and publishes the ports above.
+- **`compose.traefik.yaml`**: routes the app and the status page through an
+  existing Traefik instead of publishing ports. Expects Traefik already running
+  on an external `traefik` network, and `SONGSHARE_HOST` set.
 
 |             |                                |
 | ----------- | ------------------------------ |
