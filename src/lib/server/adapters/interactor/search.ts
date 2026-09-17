@@ -4,7 +4,7 @@ import { ShareLink } from '../../domain/share-link';
 import type { Input, Interactor, Output } from '../../usecase/search';
 
 class SearchInteractor implements Interactor {
-	constructor(private readonly providers: readonly MusicProvider[]) {}
+	constructor(private readonly providers: readonly MusicProvider[]) { }
 
 	async search(input: Input): Promise<Output> {
 		const link = ShareLink.parse(input.url);
@@ -17,7 +17,7 @@ class SearchInteractor implements Interactor {
 		const entity = await origin.fetchLinkContent(link);
 		const found: Record<string, AnyEntity> = { [origin.id]: entity };
 
-		const others = this.providers.filter((candidate) => candidate !== origin);
+		const others = this.targets(input.providers).filter((candidate) => candidate !== origin);
 		const matches = await Promise.all(others.map((provider) => this.match(provider, entity)));
 
 		for (const [id, match] of matches) {
@@ -25,6 +25,18 @@ class SearchInteractor implements Interactor {
 		}
 
 		return { origin: origin.id, matches: found as Output['matches'] };
+	}
+
+	private targets(wanted: Input['providers']): readonly MusicProvider[] {
+		if (!wanted) return this.providers;
+
+		return wanted.map((provider) => {
+			const target = this.providers.find((candidate) => candidate.id === provider);
+			if (!target) {
+				throw new UnsupportedLinkError(`No provider named ${wanted}`);
+			}
+			return target
+		})
 	}
 
 	private async match(

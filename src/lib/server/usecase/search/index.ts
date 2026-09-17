@@ -2,6 +2,7 @@ import type { AnyEntity } from '../../domain/entity';
 
 export type Input = {
 	url: string;
+	providers?: string[];
 };
 
 type ByProvider<T> = T extends unknown ? Record<string, T> : never;

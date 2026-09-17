@@ -61,6 +61,28 @@ curl 'https://songshare.example.com/api?url=https://open.spotify.com/track/4PTG3
 `track`, `album`, `artist`, `podcast` or `podcast_episode`; the remaining fields
 depend on it.
 
+### `GET /api?url=<share link>&providers=<comma-separated-names>`
+
+The same thing against one or more specific providers, when the others are of
+no interest.
+
+```sh
+curl 'https://songshare.example.com/api/?url=https://www.deezer.com/track/3786363472&providers=spotify,deezer'
+```
+
+```json
+{
+ "origin": "deezer",
+ "matches": {
+  "deezer": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." },
+  "spotify": { "type": "track", "name": "Never Gonna Give You Up", "url": "..." }
+ }
+}
+```
+
+The `providers` query param is a comma-separated list of provider names among
+the following: `spotify`, `deezer`.
+
 ### `GET /api/share?url=<share link>`
 
 Generates the short link behind a `/s/<id>` page. The same input always returns the

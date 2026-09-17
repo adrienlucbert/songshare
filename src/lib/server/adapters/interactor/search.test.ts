@@ -137,6 +137,87 @@ describe('search', () => {
 		expect(second.search).toHaveBeenCalledOnce();
 	});
 
+	it('asks only the named provider for a match', async () => {
+		const fetched = artist('Rick Astley', 'https://open.spotify.com/artist/1');
+		const deezerMatch = artist('Rick Astley', 'https://deezer.com/artist/2');
+		const spotify = fakeProvider('spotify', 'open.spotify.com', { fetched });
+		const deezer = fakeProvider('deezer', 'deezer.com', { match: deezerMatch });
+		const tidal = fakeProvider('tidal', 'tidal.com');
+		const interactor = newSearchInteractor([spotify, deezer, tidal]);
+
+		const output = await interactor.search({ url: SPOTIFY_LINK, providers: ['deezer'] });
+
+		expect(output).toEqual({
+			origin: spotify.id,
+			matches: { spotify: fetched, deezer: deezerMatch }
+		});
+		expect(deezer.search).toHaveBeenCalledOnce();
+		expect(tidal.search).not.toHaveBeenCalled();
+	});
+
+	it('asks multiple specific providers for a match', async () => {
+		const fetched = artist('Rick Astley', 'https://open.spotify.com/artist/1');
+		const deezerMatch = artist('Rick Astley', 'https://deezer.com/artist/2');
+		const tidalMatch = artist('Rick Astley', 'https://tidal.com/artist/3');
+		const spotify = fakeProvider('spotify', 'open.spotify.com', { fetched });
+		const deezer = fakeProvider('deezer', 'deezer.com', { match: deezerMatch });
+		const tidal = fakeProvider('tidal', 'tidal.com', { match: tidalMatch });
+		const qobuz = fakeProvider('qobuz', 'qobuz.com');
+		const interactor = newSearchInteractor([spotify, deezer, tidal, qobuz]);
+
+		const output = await interactor.search({ url: SPOTIFY_LINK, providers: ['deezer', 'tidal'] });
+
+		expect(output).toEqual({
+			origin: spotify.id,
+			matches: { spotify: fetched, deezer: deezerMatch, tidal: tidalMatch }
+		});
+		expect(deezer.search).toHaveBeenCalledOnce();
+		expect(tidal.search).toHaveBeenCalled();
+		expect(qobuz.search).not.toHaveBeenCalled();
+	});
+
+	it('returns the origin alone when it is itself the named provider', async () => {
+		const fetched = artist('Rick Astley', 'https://open.spotify.com/artist/1');
+		const spotify = fakeProvider('spotify', 'open.spotify.com', { fetched });
+		const deezer = fakeProvider('deezer', 'deezer.com');
+		const interactor = newSearchInteractor([spotify, deezer]);
+
+		const output = await interactor.search({ url: SPOTIFY_LINK, providers: ['spotify'] });
+
+		expect(output).toEqual({ origin: spotify.id, matches: { spotify: fetched } });
+		expect(deezer.search).not.toHaveBeenCalled();
+	});
+
+	it('rejects a provider name nothing answers to', async () => {
+		const spotify = fakeProvider('spotify', 'open.spotify.com');
+		const interactor = newSearchInteractor([spotify]);
+
+		await expect(interactor.search({ url: SPOTIFY_LINK, providers: ['qobuz'] })).rejects.toThrow(
+			UnsupportedLinkError
+		);
+	});
+
+	it('asks every provider when none is named', async () => {
+		const spotify = fakeProvider('spotify', 'open.spotify.com');
+		const deezer = fakeProvider('deezer', 'deezer.com');
+		const tidal = fakeProvider('tidal', 'tidal.com');
+		const interactor = newSearchInteractor([spotify, deezer, tidal]);
+
+		await interactor.search({ url: SPOTIFY_LINK });
+
+		expect(deezer.search).toHaveBeenCalledOnce();
+		expect(tidal.search).toHaveBeenCalledOnce();
+	});
+
+	it('rejects an unusable link before looking the provider up', async () => {
+		const spotify = fakeProvider('spotify', 'open.spotify.com');
+		const interactor = newSearchInteractor([spotify]);
+
+		await expect(interactor.search({ url: 'nonsense', providers: ['qobuz'] })).rejects.toThrow(
+			InvalidShareLinkError
+		);
+	});
+
 	it('rejects a link no provider claims', async () => {
 		const interactor = newSearchInteractor([fakeProvider('spotify', 'open.spotify.com')]);
 
