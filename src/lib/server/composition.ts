@@ -3,6 +3,7 @@ import { DeezerProvider } from './adapters/business/deezer/provider';
 import { newPostgresProviderCache } from './adapters/business/repository/postgres-provider-cache';
 import { newPostgresSharedLinkRepository } from './adapters/business/repository/postgres-shared-link-repository';
 import { SpotifyProvider } from './adapters/business/spotify/provider';
+import { YouTubeMusicProvider } from './adapters/business/youtube-music/provider';
 import { newCachedHealthInteractor, newHealthInteractor } from './adapters/interactor/health';
 import { newSearchInteractor } from './adapters/interactor/search';
 import { newShareLinkInteractor } from './adapters/interactor/share-link';
@@ -22,10 +23,12 @@ const cache = newPostgresProviderCache(CACHE_TTL_MS);
 
 const spotify = new SpotifyProvider();
 const deezer = new DeezerProvider();
+const youtubeMusic = new YouTubeMusicProvider();
 
 const providers: readonly MusicProvider[] = [
 	newCachedProvider(spotify, cache),
-	newCachedProvider(deezer, cache)
+	newCachedProvider(deezer, cache),
+	newCachedProvider(youtubeMusic, cache)
 ];
 
 export const shareLinkInteractor: shareLink.Interactor = newShareLinkInteractor(
@@ -39,7 +42,7 @@ export const searchJsonPresenter: Presenter<Output, Response> = newJsonPresenter
 const HEALTH_TTL_MS = 5 * 60 * 1000;
 
 export const healthInteractor: health.Interactor = newCachedHealthInteractor(
-	newHealthInteractor([spotify, deezer]),
+	newHealthInteractor([spotify, deezer, youtubeMusic]),
 	HEALTH_TTL_MS
 );
 

@@ -10,7 +10,7 @@ Share musics, albums, artists, podcasts across music streaming services.
 | **Deezer**        | ✅     | ✅     | ✅      | ✅       | ✅               |
 | **Qobuz**         | 📅     | 📅     | 📅      | 📅       | 📅               |
 | **Apple Music**   | 📅     | 📅     | 📅      | 📅       | 📅               |
-| **YouTube Music** | 📅     | 📅     | 📅      | 📅       | 📅               |
+| **YouTube Music** | ✅     | ✅     | ✅      | ❌       | ❌               |
 | **YouTube**       | 📅     | 📅     | 📅      | 📅       | 📅               |
 | **Tidal**         | 📅     | 📅     | 📅      | 📅       | 📅               |
 | **Google Music**  | 📅     | 📅     | 📅      | 📅       | 📅               |
@@ -81,7 +81,7 @@ curl 'https://songshare.example.com/api/?url=https://www.deezer.com/track/378636
 ```
 
 The `providers` query param is a comma-separated list of provider names among
-the following: `spotify`, `deezer`.
+the following: `spotify`, `deezer`, `youtube_music`.
 
 ### `GET /api/share?url=<share link>`
 

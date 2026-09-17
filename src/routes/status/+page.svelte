@@ -3,6 +3,7 @@
 	import { BRAND } from '$lib/brand';
 	import ProviderIcon, { brandOf } from '$lib/components/provider-icon.svelte';
 	import { useTranslator } from '$lib/i18n';
+	import { providerName } from '$lib/providers';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
@@ -12,8 +13,7 @@
 
 	const REFRESH_MS = 30_000;
 
-	const PROVIDERS: Record<string, string> = { spotify: 'Spotify', deezer: 'Deezer' };
-	const label = (id: string) => PROVIDERS[id] ?? id[0].toUpperCase() + id.slice(1);
+	const label = providerName;
 
 	type Status = NonNullable<PageData['results']>['status'];
 	type Reason = NonNullable<NonNullable<PageData['results']>['providers'][string]['reason']>;

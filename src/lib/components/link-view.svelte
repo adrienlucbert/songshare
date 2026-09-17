@@ -15,6 +15,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { useTranslator } from '$lib/i18n';
+	import { providerName } from '$lib/providers';
 	import * as m from '$lib/paraglide/messages';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
@@ -30,8 +31,7 @@
 	let { data, shared = false }: { data: View; shared?: boolean } = $props();
 
 	const { t } = useTranslator();
-	const PROVIDERS: Record<string, string> = { spotify: 'Spotify', deezer: 'Deezer' };
-	const label = (id: string) => PROVIDERS[id] ?? id[0].toUpperCase() + id.slice(1);
+	const label = providerName;
 
 	const KINDS: Record<string, () => string> = {
 		track: m.kind_track,
@@ -61,7 +61,7 @@
 
 	const artwork = $derived.by(() => {
 		if (!subject) return null;
-		if (subject.type === 'track') return subject.album.cover.url;
+		if (subject.type === 'track') return subject.cover?.url ?? subject.album?.cover.url ?? null;
 		if (subject.type === 'artist') return subject.cover?.url ?? null;
 		return subject.cover.url;
 	});
@@ -69,8 +69,10 @@
 	const caption = $derived.by(() => {
 		if (!subject) return '';
 		switch (subject.type) {
-			case 'track':
-				return `${subject.artists.map((a: { name: string }) => a.name).join(', ')} · ${subject.album.name}`;
+			case 'track': {
+				const by = subject.artists.map((a: { name: string }) => a.name).join(', ');
+				return subject.album ? `${by} · ${subject.album.name}` : by;
+			}
 			case 'album':
 				return subject.artists.map((a: { name: string }) => a.name).join(', ');
 			case 'artist':

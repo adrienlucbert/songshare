@@ -10,15 +10,15 @@ default:
 
 # Build and run the stack: app on 3000, monitoring on 3001
 run *FLAGS:
-	docker compose {{prod_files}} up {{FLAGS}}
+	docker compose {{prod_files}} up --renew-anon-volumes {{FLAGS}}
 
-# Build and run the stack with the working tree mounted and hot reload
+# Build and run the stack with the working tree mounted and hot reload.
 dev *FLAGS:
-	docker compose {{dev_files}} up {{FLAGS}}
+	docker compose {{dev_files}} up --renew-anon-volumes {{FLAGS}}
 
 # Build and run the stack behind an existing Traefik, using SONGSHARE_HOST
 run-traefik *FLAGS:
-	docker compose {{traefik_files}} up {{FLAGS}}
+	docker compose {{traefik_files}} up --renew-anon-volumes {{FLAGS}}
 
 # Stop everything and remove the containers
 down *FLAGS:

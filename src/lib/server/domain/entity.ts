@@ -24,7 +24,8 @@ export type Artist = Entity & { type: 'artist' } & {
 };
 
 export type Track = Entity & { type: 'track' } & {
-	album: Album;
+	album?: Album;
+	cover?: Cover;
 	artists: Artist[];
 	isrc?: string;
 };
