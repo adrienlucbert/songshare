@@ -40,6 +40,14 @@ endpoints:
       - "[STATUS] == 200"
       - "[BODY].providers.youtube_music.status == ok"
 
+  - name: youtube
+    group: providers
+    url: http://songshare:3000/health/providers
+    interval: 300s
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY].providers.youtube.status == ok"
+
 # Alerting: uncomment, set the webhook in .env, and add an `alerts:` block to
 # any endpoint above.
 #

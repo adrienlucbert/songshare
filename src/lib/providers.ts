@@ -1,7 +1,8 @@
 const NAMES: Record<string, string> = {
 	spotify: 'Spotify',
 	deezer: 'Deezer',
-	youtube_music: 'YouTube Music'
+	youtube_music: 'YouTube Music',
+	youtube: 'YouTube'
 };
 
 export function providerName(id: string): string {
