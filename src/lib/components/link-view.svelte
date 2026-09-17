@@ -15,6 +15,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { useTranslator } from '$lib/i18n';
+	import { playerFor } from '$lib/embed';
 	import { providerName } from '$lib/providers';
 	import * as m from '$lib/paraglide/messages';
 	import { goto } from '$app/navigation';
@@ -58,6 +59,8 @@
 	});
 
 	const subject = $derived(entries[0]?.[1] ?? null);
+
+	const player = $derived(playerFor(data.results?.matches));
 
 	const artwork = $derived.by(() => {
 		if (!subject) return null;
@@ -215,6 +218,20 @@
 				<p class="truncate text-sm text-muted-foreground">{caption}</p>
 			</div>
 		</div>
+
+		{#if player}
+			<div class="px-5 pb-4">
+				<iframe
+					src={player.src}
+					title={player.title}
+					loading="lazy"
+					referrerpolicy="strict-origin-when-cross-origin"
+					allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"
+					allowfullscreen
+					class="aspect-video w-full rounded-lg border-0 bg-muted ring-1 ring-foreground/10"
+				></iframe>
+			</div>
+		{/if}
 
 		<ul class="space-y-1 px-3 pb-3">
 			{#each entries as [provider, entity] (provider)}
