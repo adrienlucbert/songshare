@@ -86,7 +86,8 @@ the following: `spotify`, `deezer`, `youtube_music`, `youtube`.
 ### `GET /api/share?url=<share link>`
 
 Generates the short link behind a `/s/<id>` page. The same input always returns the
-same id, so it is safe to call repeatedly.
+same id, so it is safe to call repeatedly. A link no provider resolves gets no
+code: the errors below apply here too.
 
 ```sh
 curl 'https://songshare.example.com/api/share?url=https://open.spotify.com/track/4PTG3Z6ehGkBFwjybzWkR8'

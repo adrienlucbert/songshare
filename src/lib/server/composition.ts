@@ -34,11 +34,12 @@ const providers: readonly MusicProvider[] = [
 	newCachedProvider(youtube, cache)
 ];
 
-export const shareLinkInteractor: shareLink.Interactor = newShareLinkInteractor(
-	newPostgresSharedLinkRepository()
-);
-
 export const searchInteractor: Interactor = newSearchInteractor(providers);
+
+export const shareLinkInteractor: shareLink.Interactor = newShareLinkInteractor(
+	newPostgresSharedLinkRepository(),
+	searchInteractor
+);
 
 export const searchJsonPresenter: Presenter<Output, Response> = newJsonPresenter(presentSearch);
 
